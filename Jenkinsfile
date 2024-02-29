@@ -4,7 +4,7 @@ node{
     def docker
     def dockerCMD
     def tagName
-    stage('Prepare environment')
+    stage('Prepare environment') {
        echo "initialise all variable"
         mavenHome = tool name: 'maven' , type: 'maven'
         mavenCMD ="${mavenHome}/bin/mvn"
@@ -49,5 +49,6 @@ node{
           ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
       }
 
-}
+      }
+   }
 }
