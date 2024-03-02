@@ -31,11 +31,12 @@ node{
           echo "making the image out of the application"
           sh "docker build -t balu777kb/insureme:${tagName} . "
       }
-      stage('Pushing it ot the DockerHub'){
-        echo 'Pushing the docker image to DockerHub'
-        withCredentials([string(credentialsId: 'docker', variable: 'docker')]) {
-            sh "${dockerCMD} login -u balu777kb -p ${docker}"
-            sh "docker push balu777kb/insureme:${tagName}"
+    stage('login to dockerhub') {
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }  
+    stage('Pushing it ot the DockerHub'){
+      sh "docker push balu777kb/insureme:${tagName}"
       }
       stage('Configure and Deploy to the test-serverusing ansible'){  
           ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
