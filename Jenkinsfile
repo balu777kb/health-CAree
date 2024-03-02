@@ -1,15 +1,4 @@
 node{
-    def mavenHome
-    def Docker
-    def DockerCMD
-    def tagName
-    stage('Prepare environment')
-       echo "initialise all variable"
-        mavenHome = tool name: 'maven' , type: 'maven'
-        Docker = tool name: 'Docker' , type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-        DockerCMD = "${docker}/bin/docker"
-        tagName="1.0"
-        
     stage('Code Checkout')
        try{
         echo "checkout from git repo"
@@ -19,8 +8,8 @@ node{
             echo 'Exception occured in Git Code Checkout Stage'
             currentBuild.result = "FAILURE"
             emailext body: '''Dear All,
-            The Jenkins job ${JOB_NAME} has been failed. Request you to please have a look at it immediately by clicking on the below link. 
-            ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'vikul@gmail.com'
+            The Jenkins job  {JOB_NAME} has been failed. Request you to please have a look at it immediately by clicking on the below link. 
+             {BUILD_URL}''', subject: 'Job  {JOB_NAME}  {BUILD_NUMBER} is failed', to: 'vikul@gmail.com'
         }
       stage('Build the Application'){
         echo "Cleaning... Compiling...Testing... Packaging..."
@@ -33,13 +22,13 @@ node{
       }
       stage('Containerise the application'){
           echo "making the image out of the application"
-          sh "${DockerCMD} build -t balu777kb/insureme:${tagName} . "
+          sh " docker build -t balu777kb/insureme:${tagName} . "
       }
       stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
         withCredentials([string(credentialsId:'docker',variable: 'docker')]) {
-            sh "${DockerCMD} login -u balu777kb -p ${docker}"
-            sh "${DockerCMD} push balu777kb/insureme:${tagName}"
+            sh " docker login -u balu777kb -p ${docker}"
+            sh " docker push balu777kb/insureme:${tagName}"
       }
 
       stage('Configure and Deploy to the test-serverusing ansible'){  
