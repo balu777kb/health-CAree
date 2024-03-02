@@ -23,7 +23,7 @@ node{
       stage('Containerise the application'){
           echo "making the image out of the application"
           sh " docker build -t balu777kb/insureme . "
-          sh 'docker tag insureme:latest balu777kb/insureme:latest'
+          sh 'docker tag insureme balu777kb/insureme:latest'
       }
       stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
