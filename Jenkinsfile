@@ -1,4 +1,7 @@
 node{
+    environment {
+    DOCKERHUB_CREDENTIALS = credentials('docker')
+    }
     stage('Code Checkout')
        try{
         echo "checkout from git repo"
