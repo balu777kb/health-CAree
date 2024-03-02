@@ -33,13 +33,10 @@ node{
       }
       stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
-        withCredentials([string(credentialsId: 'docker')]) {
-           stage('login to dockerhub') {
-            steps{
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-            }
-        }
-     }
+        withCredentials([string(credentialsId: 'docker', variable: 'docker')]) {
+            sh "${dockerCMD} login -u vikuldocker -p ${docker}"
+            sh "${dockerCMD} push vikuldocker/insureme:${tagName}"
+      }
       stage('Configure and Deploy to the test-serverusing ansible'){  
           ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
       }
