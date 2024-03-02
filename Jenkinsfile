@@ -1,15 +1,13 @@
 node{
     def mavenHome
-    def mavenCMD
-    def docker
-    def dockerCMD
+    def Docker
+    def DockerCMD
     def tagName
     stage('Prepare environment')
        echo "initialise all variable"
         mavenHome = tool name: 'maven' , type: 'maven'
-        mavenCMD ="${mavenHome}/bin/mvn"
         Docker = tool name: 'Docker' , type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-        dockerCMD = "${docker}/bin/docker"
+        DockerCMD = "${docker}/bin/docker"
         tagName="1.0"
         
     stage('Code Checkout')
@@ -35,13 +33,13 @@ node{
       }
       stage('Containerise the application'){
           echo "making the image out of the application"
-          sh "${dockerCMD} build -t balu777kb/insureme:${tagName} . "
+          sh "${DockerCMD} build -t balu777kb/insureme:${tagName} . "
       }
       stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
         withCredentials([string(credentialsId:'docker',variable: 'docker')]) {
-            sh "${dockerCMD} login -u balu777kb -p ${docker}"
-            sh "${dockerCMD} push balu777kb/insureme:${tagName}"
+            sh "${DockerCMD} login -u balu777kb -p ${docker}"
+            sh "${DockerCMD} push balu777kb/insureme:${tagName}"
       }
 
       stage('Configure and Deploy to the test-serverusing ansible'){  
