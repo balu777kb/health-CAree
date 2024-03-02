@@ -12,7 +12,7 @@ node{
             currentBuild.result = "FAILURE"
             emailext body: '''Dear All,
             The Jenkins job  {JOB_NAME} has been failed. Request you to please have a look at it immediately by clicking on the below link. 
-             {BUILD_URL}''', subject: 'Job  {JOB_NAME}  {BUILD_NUMBER} is failed', to: 'vikul@gmail.com'
+             {BUILD_URL}''', subject: 'Job  {JOB_NAME}  {BUILD_NUMBER} is failed', to: 'admin@gmail.com'
         }
       stage('Build the Application'){
         echo "Cleaning... Compiling...Testing... Packaging..."
@@ -30,7 +30,7 @@ node{
       }
       stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
-        withCredentials([string(credentialsId: 'docker',variable: 'docker')]) {
+        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' {
             sh " docker push balu777kb/insuremee:latest"
       }
 
