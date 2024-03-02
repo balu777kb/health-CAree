@@ -8,7 +8,7 @@ node{
        echo "initialise all variable"
         mavenHome = tool name: 'maven' , type: 'maven'
         mavenCMD ="${mavenHome}/bin/mvn"
-        docker = tool name: 'docker' , type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
+        Docker = tool name: 'docker' , type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
         dockerCMD = "${docker}/bin/docker"
         tagName="1.0"
         
