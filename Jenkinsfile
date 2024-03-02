@@ -28,15 +28,16 @@ node{
           sh " docker build -t insureme . "
           sh "docker tag insureme:latest balu777kb/insuremee:latest"
       }
-      stage('Pushing it ot the DockerHub'){
-        echo 'Pushing the docker image to DockerHub'
-       steps{
+      stage('login to dockerhub') {
+            steps{
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-            } 
-          {
-            sh " docker push balu777kb/insuremee:latest"
-      }
-
+            }
+        }
+        stage('push image') {
+            steps{
+                sh 'docker push balu777kb/insuremee:latest'
+               }
+          }
       stage('Configure and Deploy to the test-serverusing ansible'){  
           ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
       }
