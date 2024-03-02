@@ -34,7 +34,9 @@ node{
       stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
         withCredentials([string(credentialsId: 'docker')]) {
-            sh "docker login -u balu777kb -p ${docker}"
+             steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+               }            
             sh "docker push balu777kb/insureme:${tagName}"
       }
 
