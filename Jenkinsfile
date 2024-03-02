@@ -4,10 +4,14 @@ node{
     def docker
     def dockerCMD
     def tagName
-    
-    environment {
-    DOCKERHUB_CREDENTIALS = credentials('docker')
-    }    
+    stage('Prepare environment')
+       echo "initialise all variable"
+        mavenHome = tool name: 'maven' , type: 'maven'
+        mavenCMD ="${mavenHome}/bin/mvn"
+        docker = tool name: 'docker' , type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
+        dockerCMD = "${docker}/bin/docker"
+        tagName="1.0"
+        
     stage('Code Checkout')
        try{
         echo "checkout from git repo"
@@ -18,12 +22,12 @@ node{
             currentBuild.result = "FAILURE"
             emailext body: '''Dear All,
             The Jenkins job ${JOB_NAME} has been failed. Request you to please have a look at it immediately by clicking on the below link. 
-            ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'adminl@gmail.com'
+            ${BUILD_URL}''', subject: 'Job ${JOB_NAME} ${BUILD_NUMBER} is failed', to: 'vikul@gmail.com'
         }
       stage('Build the Application'){
         echo "Cleaning... Compiling...Testing... Packaging..."
         //sh 'mvn clean package'
-        sh "mvn clean package"     
+        sh "${mavenCMD} clean package"     
     }
       stage('publish the report'){
           echo "generating test reports"
@@ -31,18 +35,19 @@ node{
       }
       stage('Containerise the application'){
           echo "making the image out of the application"
-          sh "docker build -t balu777kb/insureme:${tagName} . "
+          sh "${dockerCMD} build -t balu777kb/insureme:${tagName} . "
       }
-    stage('login to dockerhub') {
-            steps{
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-            }  
-    stage('Pushing it ot the DockerHub'){
-      sh "docker push balu777kb/insureme:${tagName}"
+      stage('Pushing it ot the DockerHub'){
+        echo 'Pushing the docker image to DockerHub'
+        withCredentials([string(credentialsId: 'dockerhubpassword', variable: 'dockerhubpassword')]) {
+            sh "${dockerCMD} login -u balu777kb -p ${dockerhubpassword}"
+            sh "${dockerCMD} push balu777kb/insureme:${tagName}"
       }
+
       stage('Configure and Deploy to the test-serverusing ansible'){  
           ansiblePlaybook become: true, credentialsId: 'ansible-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml'
       }
 
-      }
-   }
+}
+}
+
