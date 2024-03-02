@@ -23,11 +23,12 @@ node{
       stage('Containerise the application'){
           echo "making the image out of the application"
           sh " docker build -t balu777kb/insureme . "
+          sh 'docker tag insureme:latest balu777kb/insureme:latest'
       }
       stage('Pushing it ot the DockerHub'){
         echo 'Pushing the docker image to DockerHub'
         withCredentials([string(credentialsId: 'docker',variable: 'docker')]) {
-            sh " docker push balu777kb/insureme"
+            sh " docker push balu777kb/insureme:latest"
       }
 
       stage('Configure and Deploy to the test-serverusing ansible'){  
